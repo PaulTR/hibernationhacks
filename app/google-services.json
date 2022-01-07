@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "239108067527",
+    "project_id": "ptruiz-goatbot",
+    "storage_bucket": "ptruiz-goatbot.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:239108067527:android:699bd8288b06ef34c96ee2",
+        "android_client_info": {
+          "package_name": "com.ptruiz.test_face"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "239108067527-nqmiusgr862itrr8kb8h8fneo9bacehf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOj072ABFbrPSsq-mkTpLHYdCM2STiR0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "239108067527-nqmiusgr862itrr8kb8h8fneo9bacehf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
