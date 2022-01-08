@@ -1,6 +1,6 @@
 package com.ptruiz.test_face
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
+import android.bluetooth.*
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -66,7 +66,7 @@ class MyWatchFace : CanvasWatchFaceService() {
         private val handler = Handler()
 
         // Stops scanning after 10 seconds.
-        private val SCAN_PERIOD: Long = 10000
+        private val SCAN_PERIOD: Long = 30000
 
 
         private val mBackgroundColor = Color.parseColor("black")
@@ -153,9 +153,53 @@ class MyWatchFace : CanvasWatchFaceService() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 super.onScanResult(callbackType, result)
 
-                if( !TextUtils.isEmpty(result.device.name)) {
-                    Log.e("Test", result.device.name)
+                if( !TextUtils.isEmpty(result.device.name) && result.device.name.toLowerCase().contains("sample")) {
+                    Log.e("Test", "device found: " + result.device.name)
                     text4 = result.device.name
+                    invalidate()
+                    result.device.connectGatt(applicationContext, true, object: BluetoothGattCallback() {
+                        override fun onConnectionStateChange(
+                            gatt: BluetoothGatt?,
+                            status: Int,
+                            newState: Int
+                        ) {
+                            super.onConnectionStateChange(gatt, status, newState)
+                            Log.e("Test", "onconnectionstatechanged")
+
+                            if( status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED ) {
+                                gatt?.discoverServices()
+                                Thread.sleep(1000)
+                            }
+                        }
+
+                        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+                            super.onServicesDiscovered(gatt, status)
+                            var service : BluetoothGattService? = gatt?.getService(UUID.fromString("9c81420d-8a1e-49f8-a42f-d4679c7330be"))
+                            if( service != null ) {
+                                for (characteristic in service.characteristics) {
+                                    Log.e("Test", "characteristic: " + characteristic.uuid)
+                                    gatt?.readCharacteristic(characteristic)
+                                }
+                            }
+                        }
+
+                        override fun onCharacteristicRead(
+                            gatt: BluetoothGatt?,
+                            characteristic: BluetoothGattCharacteristic?,
+                            status: Int
+                        ) {
+                            super.onCharacteristicRead(gatt, characteristic, status)
+                            Log.e("Test", "characteristic read")
+                            if( characteristic != null) {
+                                Log.e(
+                                    "Test",
+                                    "characteristic value: " + String(characteristic.value)
+                                )
+                                text4 = "RCVD: " + String(characteristic.value)
+                                invalidate()
+                            }
+                        }
+                    })
                 }
             }
         }

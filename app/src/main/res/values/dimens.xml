@@ -8,10 +8,10 @@
     <dimen name="x_offset_2">25px</dimen>
 
     <dimen name="y_offset_3">160px</dimen>
-    <dimen name="x_offset_3">260px</dimen>
+    <dimen name="x_offset_3">230px</dimen>
 
     <dimen name="y_offset_4">260px</dimen>
-    <dimen name="x_offset_4">260px</dimen>
+    <dimen name="x_offset_4">230px</dimen>
 
     <dimen name="text_size">12dp</dimen>
 
