@@ -132,7 +132,6 @@ class AppLinkService : Service(), IProxyListenerALM {
             //start vibrating
             val vibrator = applicationContext?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             val pattern = longArrayOf(0, 2000.toLong())
-
             vibrator.vibrate(pattern, -1)
         }
     }
