@@ -1,7 +1,9 @@
 package com.ptruiz.test_face
+
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
+import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.os.Handler
@@ -12,22 +14,13 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.WindowInsets
 import android.widget.Toast
+import com.ford.syncV4.proxy.SyncProxyALM
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.*
-import com.ford.syncV4.proxy.SyncProxyALM
-
-import android.content.Intent
-
-import android.bluetooth.BluetoothDevice
-
-import android.bluetooth.BluetoothAdapter
-
-
-
 
 class MyWatchFace : CanvasWatchFaceService() {
     override fun onCreateEngine(): Engine {
