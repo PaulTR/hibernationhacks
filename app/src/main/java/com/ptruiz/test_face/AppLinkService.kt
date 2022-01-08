@@ -2,30 +2,17 @@ package com.ptruiz.test_face
 
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.IBinder
+import android.os.Vibrator
 import com.ford.syncV4.exception.SyncException
 import com.ford.syncV4.exception.SyncExceptionCause
 import com.ford.syncV4.proxy.SyncProxyALM
 import com.ford.syncV4.proxy.interfaces.IProxyListenerALM
 import com.ford.syncV4.proxy.rpc.*
 import com.ford.syncV4.proxy.rpc.enums.*
-import java.io.IOException
-import android.R
-import android.content.Context
-import android.os.VibrationEffect
 
-import android.os.Vibrator
-
-
-
-
-
-/**
- * Created by PaulTR on 5/31/14.
- */
 class AppLinkService : Service(), IProxyListenerALM {
 
     var proxy: SyncProxyALM? = null
