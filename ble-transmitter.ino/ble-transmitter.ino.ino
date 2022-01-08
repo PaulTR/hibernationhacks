@@ -12,6 +12,8 @@
 #define RECIVE_STRING "cd468881-1cda-47a1-9373-dc812d15d727"
 #define UI_ID "dfa653"
 
+int led_state = LOW;    // the current state of LED
+
 bool deviceConnected = false;
 
 BLECharacteristic *sSendString;
@@ -36,17 +38,17 @@ bool intToBool(int value) {
   return true;
 }
 
-//class ConnectionServerCallbacks: public BLEServerCallbacks {
-//    void onConnect(BLEServer* pServer) {
-//      deviceConnected = true;
-//      Serial.println("Connected");
-//    };
-//
-//    void onDisconnect(BLEServer* pServer) {
-//      deviceConnected = false;
-//      Serial.println("Disconnected");
-//    }
-//};
+class ConnectionServerCallbacks: public BLEServerCallbacks {
+    void onConnect(BLEServer* pServer) {
+      deviceConnected = true;
+      Serial.println("Connected");
+    };
+
+    void onDisconnect(BLEServer* pServer) {
+      deviceConnected = false;
+      Serial.println("Disconnected");
+    }
+};
 
 class WriteString: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
@@ -62,6 +64,7 @@ class WriteString: public BLECharacteristicCallbacks {
         //handle action! - this is where we'd interact with peripherals
         Serial.print("we got a new action: ");
         Serial.println(str);
+        toggleLED();
       }
 
     }
@@ -74,7 +77,7 @@ void setup() {
 
   BLEDevice::init(DEVICENAME);
   BLEServer *btServer = BLEDevice::createServer();
-  //btServer->setCallbacks(new ConnectionServerCallbacks());
+  btServer->setCallbacks(new ConnectionServerCallbacks());
 
   BLEService *sRecive = btServer->createService(RECIVE);
   uint32_t cwrite = BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE;
@@ -91,11 +94,16 @@ void setup() {
   sSendString->addDescriptor(new BLE2902());
   sSendString->setValue("BLE Val");
 
-  //sRecive->start();
+  sRecive->start();
   sSend->start();
   
   BLEAdvertising *pAdvertising = btServer->getAdvertising();
   pAdvertising->start();
+}
+
+void toggleLED() {
+  led_state = !led_state;
+  digitalWrite(2, led_state);
 }
 
 void loop() {}
