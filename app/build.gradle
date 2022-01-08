@@ -13,8 +13,8 @@ android {
 
     defaultConfig {
         applicationId "com.ptruiz.test_face"
-        minSdk 30
-        targetSdk 31
+        minSdk 22
+        targetSdk 22
         versionCode 1
         versionName "1.0"
 
@@ -41,6 +41,10 @@ dependencies {
     compileOnly 'com.google.android.wearable:wearable:2.8.1'
     implementation platform('com.google.firebase:firebase-bom:29.0.3')
     implementation 'com.google.firebase:firebase-database'
+
+    implementation 'no.nordicsemi.android:ble:2.3.1'
+    implementation 'no.nordicsemi.android:ble-ktx:2.3.1'
+    implementation 'no.nordicsemi.android:ble-common:2.3.1'
 
 }
 

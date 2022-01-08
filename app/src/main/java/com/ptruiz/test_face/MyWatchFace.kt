@@ -1,18 +1,27 @@
 package com.ptruiz.test_face
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
+import android.text.TextUtils
 import android.text.format.Time
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.WindowInsets
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -24,11 +33,6 @@ import com.google.firebase.database.ValueEventListener
 class MyWatchFace : CanvasWatchFaceService() {
     override fun onCreateEngine(): Engine {
         return WatchFaceEngine()
-    }
-
-    companion object {
-        private const val MSG_UPDATE_TIME_ID = 42
-        private const val DEFAULT_UPDATE_RATE_MS: Long = 1000
     }
 
     private inner class WatchFaceEngine : Engine() {
@@ -57,6 +61,14 @@ class MyWatchFace : CanvasWatchFaceService() {
         private var text3 = "Hello World"
         private var text4 = "Hello World"
 
+        private val bluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().bluetoothLeScanner
+        private var scanning = false
+        private val handler = Handler()
+
+        // Stops scanning after 10 seconds.
+        private val SCAN_PERIOD: Long = 10000
+
+
         private val mBackgroundColor = Color.parseColor("black")
         private val mTextColor = Color.parseColor("green")
 
@@ -72,6 +84,7 @@ class MyWatchFace : CanvasWatchFaceService() {
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
                     .setShowSystemUiTime(false)
+                    .setAcceptsTapEvents(true)
                     .build()
             )
             initBackground()
@@ -112,6 +125,39 @@ class MyWatchFace : CanvasWatchFaceService() {
 
                 override fun onCancelled(error: DatabaseError) {}
             })
+
+
+        }
+
+        override fun onTapCommand(tapType: Int, x: Int, y: Int, eventTime: Long) {
+            super.onTapCommand(tapType, x, y, eventTime)
+            Toast.makeText(applicationContext, "Searching for beacon", Toast.LENGTH_SHORT).show()
+            scanLeDevice()
+        }
+
+        private fun scanLeDevice() {
+            if (!scanning) { // Stops scanning after a pre-defined scan period.
+                handler.postDelayed({
+                    scanning = false
+                    bluetoothLeScanner.stopScan(leScanCallback)
+                }, SCAN_PERIOD)
+                scanning = true
+                bluetoothLeScanner.startScan(leScanCallback)
+            } else {
+                scanning = false
+                bluetoothLeScanner.stopScan(leScanCallback)
+            }
+        }
+
+        private val leScanCallback: ScanCallback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                super.onScanResult(callbackType, result)
+
+                if( !TextUtils.isEmpty(result.device.name)) {
+                    Log.e("Test", result.device.name)
+                    text4 = result.device.name
+                }
+            }
         }
 
         override fun onApplyWindowInsets(insets: WindowInsets) {
