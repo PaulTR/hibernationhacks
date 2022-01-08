@@ -1,34 +1,33 @@
 package com.ptruiz.test_face
-import android.Manifest
 import android.bluetooth.*
-import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.graphics.*
 import android.os.Bundle
 import android.os.Handler
-import android.os.Message
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.text.TextUtils
-import android.text.format.Time
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.WindowInsets
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import java.util.*
-import java.util.concurrent.TimeUnit
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.*
+import com.ford.syncV4.proxy.SyncProxyALM
+
+import android.content.Intent
+
+import android.bluetooth.BluetoothDevice
+
+import android.bluetooth.BluetoothAdapter
+
+
+
 
 class MyWatchFace : CanvasWatchFaceService() {
     override fun onCreateEngine(): Engine {
@@ -36,13 +35,9 @@ class MyWatchFace : CanvasWatchFaceService() {
     }
 
     private inner class WatchFaceEngine : Engine() {
-        //Member variables
         private val WATCH_TEXT_TYPEFACE = Typeface.create(Typeface.SERIF, Typeface.NORMAL)
-        private var mUpdateRateMs: Long = 1000
         private var mBackgroundColorPaint: Paint? = null
         private var mTextColorPaint: Paint? = null
-        private var mHasTimeZoneReceiverBeenRegistered = false
-        private var mIsInMuteMode = false
         private var mIsLowBitAmbient = false
         private var mXOffset_1 = 0f
         private var mYOffset_1 = 0f
@@ -73,6 +68,34 @@ class MyWatchFace : CanvasWatchFaceService() {
         private val mTextColor = Color.parseColor("green")
 
         private var database: FirebaseDatabase? = null
+
+
+        //Ford AppLink
+        private fun startSyncProxyService() {
+            var isPaired = false
+            val btAdapter = BluetoothAdapter.getDefaultAdapter()
+            if (btAdapter != null) {
+                if (btAdapter.isEnabled && btAdapter.bondedDevices != null && !btAdapter.bondedDevices.isEmpty()) {
+                    for (device in btAdapter.bondedDevices) {
+                        if (device.name != null && device.name.contains("SYNC")) {
+                            isPaired = true
+                            break
+                        }
+                    }
+                }
+                if (isPaired) {
+                    if (AppLinkService.instance == null) {
+                        val appLinkServiceIntent = Intent(applicationContext, AppLinkService::class.java)
+                        startService(appLinkServiceIntent)
+                    } else {
+                        val proxyInstance: SyncProxyALM? = (AppLinkService.instance as AppLinkService).proxy
+                        if (proxyInstance == null) {
+                            (AppLinkService.instance as AppLinkService).startProxy()
+                        }
+                    }
+                }
+            }
+        }
 
         //Overridden methods
         override fun onCreate(holder: SurfaceHolder) {
@@ -126,6 +149,7 @@ class MyWatchFace : CanvasWatchFaceService() {
                 override fun onCancelled(error: DatabaseError) {}
             })
 
+            startSyncProxyService()
 
         }
 
