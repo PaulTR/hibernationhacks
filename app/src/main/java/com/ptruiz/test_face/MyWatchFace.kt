@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.functions.FirebaseFunctions
 import java.util.*
 
 class MyWatchFace : CanvasWatchFaceService() {
@@ -143,13 +144,13 @@ class MyWatchFace : CanvasWatchFaceService() {
             })
 
             startSyncProxyService()
-
         }
 
         override fun onTapCommand(tapType: Int, x: Int, y: Int, eventTime: Long) {
             super.onTapCommand(tapType, x, y, eventTime)
             Toast.makeText(applicationContext, "Searching for beacon", Toast.LENGTH_SHORT).show()
             scanLeDevice()
+            FirebaseFunctions.getInstance().getHttpsCallable("sendTwilioSmS")
         }
 
         private fun scanLeDevice() {
